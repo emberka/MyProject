@@ -14,6 +14,7 @@ class MYPROJECT_API USAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+
 	// Sets default values for this component's properties
 	USAttributeComponent();
 
@@ -35,5 +36,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float Delta);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable)
+		float GetHealthMax() const;
+
+	UFUNCTION(BlueprintCallable)
+		float GetHealth();
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+		static USAttributeComponent* GetAttributes(AActor* FromActor);
 
 };

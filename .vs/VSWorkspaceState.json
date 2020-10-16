@@ -1,11 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\MyProject-master",
-    "\\MyProject-master\\Source",
-    "\\MyProject-master\\Source\\MyProject",
-    "\\MyProject-master\\Source\\MyProject\\Private",
-    "\\MyProject-master\\Source\\MyProject\\Public"
+    "\\MyProject",
+    "\\MyProject\\Source",
+    "\\MyProject\\Source\\MyProject",
+    "\\MyProject\\Source\\MyProject\\Private",
+    "\\MyProject\\Source\\MyProject\\Public"
   ],
+  "SelectedNode": "\\MyProject\\Source\\MyProject\\MyProject.Build.cs",
   "PreviewInSolutionExplorer": false
 }
