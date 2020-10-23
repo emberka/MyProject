@@ -2,6 +2,7 @@
 
 
 #include "SAttributeComponent.h"
+#include "SGameModeBase.h"
 
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
@@ -15,18 +16,47 @@ bool USAttributeComponent::IsMaxHealth() const
 	return Health == HealthMax;
 }
 
-bool USAttributeComponent::ApplyHealthChange(float Delta)
+bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	float OldHealth = Health; 
+
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	float ActualDelta = Health - OldHealth;
 
-	return true;
+	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta);
+
+	if (ActualDelta < 0.0f && Health == 0.0f)
+	{
+		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+		if (GM)
+		{
+			GM->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
+
+	return ActualDelta != 0;
 }
 
 bool USAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;
+}
+
+bool USAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -GetHealthMax());
+}
+
+bool USAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	USAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if (AttributeComp)
+	{
+		return AttributeComp->IsAlive();
+	}
+
+	return false;
 }
 
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)

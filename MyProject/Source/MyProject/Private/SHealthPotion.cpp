@@ -3,53 +3,41 @@
 
 #include "SHealthPotion.h"
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 // Sets default values
 ASHealthPotion::ASHealthPotion()
 {
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
-	RootComponent = MeshComp;
-	SetActorEnableCollision(true);
-	SetActorHiddenInGame(false);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(RootComponent);
 
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	Cost = 10.0;
 }
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
-	if (InstigatorPawn)
+	if (ensure(InstigatorPawn))
 	{
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (AttributeComp && !AttributeComp->IsMaxHealth())
+		if (ensure(AttributeComp) && !AttributeComp->IsMaxHealth())
 		{
-			AttributeComp->ApplyHealthChange(15.0f);
-			SetActorEnableCollision(false);
-			SetActorHiddenInGame(true); 
-			
-			GetWorldTimerManager().SetTimer(TimerHandle_Reactivate, this, &ASHealthPotion::Reactivate, 10.0f);
+			APlayerController* PC = Cast<APlayerController>(InstigatorPawn->GetController());
+			ASPlayerState* PS = Cast<ASPlayerState>(PC->PlayerState);
+
+			if (PS)
+			{
+				if (PS->GetNumCredits() >= Cost)
+				{
+					if (AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax()) && PS->ApplyCreditsChange(this, -Cost))
+					{
+						Cooldown();
+					}
+				}
+
+			}
+
 		}
 	}
-}
-
-void ASHealthPotion::Reactivate()
-{
-	SetActorEnableCollision(true);
-	SetActorHiddenInGame(false);
-}
-
-// Called when the game starts or when spawned
-void ASHealthPotion::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ASHealthPotion::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

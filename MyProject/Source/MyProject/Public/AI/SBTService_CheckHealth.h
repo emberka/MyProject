@@ -16,6 +16,12 @@ class MYPROJECT_API USBTService_CheckHealth : public UBTService
 	
 protected:
 
+	UPROPERTY(EditAnywhere, Category = "AI")
+		FBlackboardKeySelector HealthIsLow;
+
+	UPROPERTY(EditAnywhere, Category = "AI", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+		float LowHealthThreshold;
+
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 };

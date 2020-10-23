@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
+#include "SPlayerState.h"
 #include "SGameModeBase.generated.h"
 
 class UEnvQuery;
@@ -20,6 +21,8 @@ class MYPROJECT_API ASGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
+
+	float Bounty;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 		TSubclassOf<AActor> MinionClass;
@@ -41,7 +44,12 @@ protected:
 	UFUNCTION()
 		void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
+	UFUNCTION()
+		void RespawnPlayerElapsed(AController* Controller);
+
 public:
+
+	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 
 	ASGameModeBase();
 

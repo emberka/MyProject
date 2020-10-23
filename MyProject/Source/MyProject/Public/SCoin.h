@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "SPowerUpItem.h"
 #include "SPlayerState.h"
-#include "SHealthPotion.generated.h"
+#include "SCoin.generated.h"
 
 class UStaticMeshComponent;
 
 UCLASS()
-class MYPROJECT_API ASHealthPotion : public ASPowerUpItem
+class MYPROJECT_API ASCoin : public ASPowerUpItem
 {
 	GENERATED_BODY()
 
 protected:
 
-	float Cost;
+	float Amount;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 		UStaticMeshComponent* MeshComp;
@@ -25,6 +25,5 @@ public:
 
 	void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	ASHealthPotion();
+	ASCoin();
 };
-

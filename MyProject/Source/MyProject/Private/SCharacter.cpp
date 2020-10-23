@@ -8,6 +8,7 @@
 #include "SInteractionComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -96,6 +97,11 @@ void ASCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+}
+
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 void ASCharacter::SpawnProjectile(TSubclassOf<AActor> Class)

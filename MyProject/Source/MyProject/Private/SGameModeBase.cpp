@@ -7,25 +7,11 @@
 #include "SAttributeComponent.h"
 #include "EngineUtils.h"
 #include "AI/SAICharacter.h"
+#include "SCharacter.h"
+#include "SPlayerState.h"
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
-	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
-	if (ensure(QueryInstance))
-	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
-	}
-
-}
-
-void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
-{
-	if (QueryStatus != EEnvQueryStatus::Success)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn bot EQS Query Failed!"));
-		return;
-	}
-
 	int32 NrOfAliveBots = 0;
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)
 	{
@@ -47,6 +33,22 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 		return;
 	}
 
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
+	if (ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
+	}
+
+}
+
+void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn bot EQS Query Failed!"));
+		return;
+	}
+
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 
 	if (Locations.IsValidIndex(0))
@@ -55,9 +57,13 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 	}
 }
 
+
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
+	PlayerStateClass = ASPlayerState::StaticClass();
+
+	Bounty = 10.0;
 }
 
 void ASGameModeBase::StartPlay()
@@ -66,4 +72,49 @@ void ASGameModeBase::StartPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 
+}
+
+void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+{
+	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
+	if (Player)
+	{
+		FTimerHandle TimerHandle_RespawnDelay;
+
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
+
+		float RespawnDelay = 2.0f;
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+	}
+	else
+	{
+		ASAICharacter* Minion = Cast<ASAICharacter>(VictimActor);
+		Player = Cast<ASCharacter>(Killer);
+
+		if (Minion && Player)
+		{
+			APlayerController* PC = Cast<APlayerController>(Player->GetController());
+			if (PC)
+			{
+				ASPlayerState* PS = Cast<ASPlayerState>(PC->PlayerState);
+				if (PS)
+				{
+					PS->ApplyCreditsChange(this, Bounty);
+				}
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if (ensure(Controller))
+	{
+		Controller->UnPossess();
+
+		RestartPlayer(Controller);
+	}
 }
