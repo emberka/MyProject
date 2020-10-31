@@ -11,6 +11,8 @@ class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class USActionComponent;
+class USActionEffect;
 
 UCLASS()
 class MYPROJECT_API ASCharacter : public ACharacter
@@ -19,27 +21,14 @@ class MYPROJECT_API ASCharacter : public ACharacter
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> BlackHoleProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> DashMagicProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		UAnimMontage* AttackAnim;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
-	FTimerHandle TimerHandle_Dash;
-
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Buffs")
+	TSubclassOf<USActionEffect> BuffEffectClass;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
@@ -53,6 +42,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -60,9 +52,11 @@ protected:
 
 	void MoveSideways(float Value);
 
-	void PrimaryAttack();
+	void SprintStart();
 
-	void PrimaryAttack_TimeElapsed();
+	void SprintStop();
+
+	void PrimaryAttack();
 
 	void BlackHoleAttack();
 
@@ -70,11 +64,7 @@ protected:
 
 	void PrimaryInteract();
 
-	void SpawnProjectile(TSubclassOf<AActor> Class);
-
 	void Dash();
-
-	void Dash_TimeElapsed();
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);

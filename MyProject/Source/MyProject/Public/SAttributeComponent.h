@@ -26,6 +26,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float HealthMax;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	float Rage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	float RageMax;
+
 public:	
 
 	UFUNCTION(BlueprintCallable)
@@ -36,6 +42,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyRageChange(AActor* InstigatorActor, float Delta);
 
 	UFUNCTION(BlueprintCallable)
 		bool IsAlive() const;
@@ -48,6 +57,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
+
+	UFUNCTION(BlueprintCallable)
+		float GetRageMax() const;
+
+	UFUNCTION(BlueprintCallable)
+		float GetRage();
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 		static USAttributeComponent* GetAttributes(AActor* FromActor);

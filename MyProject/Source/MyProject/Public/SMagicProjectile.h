@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "SMagicProjectile.generated.h"
 
 class USphereComponent;
@@ -11,6 +12,7 @@ class UProjectileMovementComponent;
 class UParticleSystemComponent;
 class UAudioComponent;
 class USoundCue;
+class USActionEffect;
 
 UCLASS()
 class MYPROJECT_API ASMagicProjectile : public AActor
@@ -22,6 +24,12 @@ public:
 	ASMagicProjectile();
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect> BurningActionClass;
 
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -39,7 +47,7 @@ protected:
 	UAudioComponent* AudioComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-		UParticleSystem* ImpactVFX;
+	UParticleSystem* ImpactVFX;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	USoundCue* ImpactSound;

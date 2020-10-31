@@ -19,16 +19,16 @@ class MYPROJECT_API USWorldUserWidget : public UUserWidget
 protected:
 
 	UPROPERTY(meta = (BindWidget))
-		USizeBox* ParentSizeBox;
+	USizeBox* ParentSizeBox;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
 
 	UPROPERTY(EditAnywhere, Category = "UI")
-		FVector WorldOffset;
+	FVector WorldOffset;
 
 	UPROPERTY(BlueprintReadOnly, Category = "UI")
-		AActor* AttachedActor;
+	AActor* AttachedActor;
 	
 };
