@@ -16,6 +16,7 @@ class MYPROJECT_API ASPlayerState : public APlayerState
 
 protected:
 
+	UPROPERTY(Replicated)
 	float Credits;
 	
 public:

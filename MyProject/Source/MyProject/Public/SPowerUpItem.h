@@ -18,6 +18,12 @@ class MYPROJECT_API ASPowerUpItem : public AActor, public ISGameplayInterface
 	GENERATED_BODY()
 
 protected:
+	
+	UPROPERTY(ReplicatedUsing = "OnRep_Consumed", BlueprintReadOnly)
+	bool bConsumed;
+
+	UFUNCTION()
+	void OnRep_Consumed();
 
 	UPROPERTY(EditAnywhere, Category = "PowerUp")
 		float RespawnTime;

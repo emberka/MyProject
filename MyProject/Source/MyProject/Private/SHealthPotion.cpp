@@ -17,6 +17,7 @@ ASHealthPotion::ASHealthPotion()
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
+
 	if (ensure(InstigatorPawn))
 	{
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
@@ -40,4 +41,3 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		}
 	}
 }
-

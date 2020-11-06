@@ -3,6 +3,7 @@
 
 #include "SPowerUpItem.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 ASPowerUpItem::ASPowerUpItem()
@@ -12,6 +13,8 @@ ASPowerUpItem::ASPowerUpItem()
 	RootComponent = SphereComp;
 
 	RespawnTime = 10.0f;
+
+	SetReplicates(true);
 }
 
 
@@ -23,15 +26,15 @@ void ASPowerUpItem::Interact_Implementation(APawn* InstigatorPawn)
 
 void ASPowerUpItem::ShowPowerUp()
 {
-	SetPowerUpState(true);
+	bConsumed = false;
+	OnRep_Consumed();
 }
 
 
 void ASPowerUpItem::Cooldown()
 {
-	SetPowerUpState(false);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Reactivate, this, &ASPowerUpItem::ShowPowerUp, RespawnTime);
+	bConsumed = true;
+	OnRep_Consumed();
 }
 
 void ASPowerUpItem::SetPowerUpState(bool bNewIsActive)
@@ -40,4 +43,24 @@ void ASPowerUpItem::SetPowerUpState(bool bNewIsActive)
 
 	// Set visibility on root and all children
 	RootComponent->SetVisibility(bNewIsActive, true);
+}
+
+void ASPowerUpItem::OnRep_Consumed()
+{
+	if (bConsumed)
+	{
+		SetPowerUpState(false);
+		GetWorldTimerManager().SetTimer(TimerHandle_Reactivate, this, &ASPowerUpItem::ShowPowerUp, RespawnTime);
+	}
+	else
+	{
+		SetPowerUpState(true);
+	}
+}
+
+void ASPowerUpItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPowerUpItem, bConsumed);
 }

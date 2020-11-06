@@ -2,10 +2,12 @@
 
 
 #include "SPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 ASPlayerState::ASPlayerState()
 {
 	Credits = 0.0;
+
 }
 
 bool ASPlayerState::ApplyCreditsChange(AActor* InstigatorActor, float Delta)
@@ -22,4 +24,11 @@ bool ASPlayerState::ApplyCreditsChange(AActor* InstigatorActor, float Delta)
 float ASPlayerState::GetNumCredits() const
 {
 	return Credits;
+}
+
+void ASPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPlayerState, Credits);
 }
