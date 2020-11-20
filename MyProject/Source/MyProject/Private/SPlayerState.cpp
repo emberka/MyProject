@@ -2,6 +2,7 @@
 
 
 #include "SPlayerState.h"
+#include "SSaveGame.h"
 #include "Net/UnrealNetwork.h"
 
 ASPlayerState::ASPlayerState()
@@ -21,6 +22,19 @@ bool ASPlayerState::ApplyCreditsChange(AActor* InstigatorActor, float Delta)
 	return ActualDelta != 0;
 }
 
+void ASPlayerState::AddCredits(int32 Delta)
+{
+	// Avoid user-error of adding a negative amount
+	if (!ensure(Delta >= 0.0f))
+	{
+		return;
+	}
+
+	Credits += Delta;
+
+	OnCreditsChanged.Broadcast(this, Credits, Delta);
+}
+
 float ASPlayerState::GetNumCredits() const
 {
 	return Credits;
@@ -31,4 +45,23 @@ void ASPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASPlayerState, Credits);
+}
+
+void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;
+	}
+}
+
+
+void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		//Credits = SaveObject->Credits;
+		// Makes sure we trigger credits changed event
+		AddCredits(SaveObject->Credits);
+	}
 }

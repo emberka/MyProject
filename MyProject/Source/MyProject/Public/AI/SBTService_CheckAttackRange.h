@@ -20,5 +20,8 @@ protected:
 	FBlackboardKeySelector AttackRangeKey;
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float AttackRange;
 	
 };
